@@ -1,0 +1,26 @@
+stateDiagram-v2
+    [*] --> EventReceived
+    EventReceived --> ValidateTelemetry
+    ValidateTelemetry --> InvalidData: schema fail
+    ValidateTelemetry --> CeilingLookup: valid
+
+    CeilingLookup --> TrajectoryProjection
+    TrajectoryProjection --> RiskScoring
+    RiskScoring --> NoAlert: risk < threshold
+    RiskScoring --> AlertDrafted: risk >= threshold
+
+    AlertDrafted --> AutoNotify: confidence high
+    AlertDrafted --> HITLReview: confidence low or severity high
+
+    HITLReview --> OperatorNotified: approve
+    HITLReview --> Monitoring: override
+    AutoNotify --> Monitoring
+    OperatorNotified --> Monitoring
+
+    Monitoring --> Resolved: climb corrected
+    Monitoring --> BreachConfirmed: ceiling crossed
+
+    InvalidData --> [*]
+    NoAlert --> [*]
+    Resolved --> [*]
+    BreachConfirmed --> [*]
