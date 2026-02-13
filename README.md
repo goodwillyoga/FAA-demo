@@ -3,46 +3,38 @@
 [![CI](https://github.com/goodwillyoga/FAA-demo/actions/workflows/ci.yml/badge.svg)](https://github.com/goodwillyoga/FAA-demo/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
 
-Open-source reference implementation for low-altitude UAS risk awareness using simulated telemetry.
+Autonomous low-altitude risk awareness for UAS operations, focused on early warning and human-governed response.
 
-## Environment Setup
-This project is local-first and uses a Python virtual environment in the repo root.
+## Why This Project
+Low-altitude airspace is becoming denser, and safety teams need earlier warning signals than manual monitoring can provide.
+This project shows how an agentic orchestration layer can sit on top of existing data and model pipelines to produce actionable risk alerts with clear audit trails.
 
-1. `python3 -m venv .venv`
-2. `source .venv/bin/activate`
-3. `python3 -m pip install --upgrade pip`
-4. `python3 -m pip install -e '.[dev,api]'`
+## What It Delivers
+- Early warning of likely altitude-ceiling crossing before violation occurs.
+- Stateful orchestration across risk tools and policy routing.
+- Human-in-the-loop escalation path for high-risk or low-confidence decisions.
+- Technical traceability for review, replay, and governance.
 
-Alternative (requirements files):
-1. `python3 -m pip install -r requirements-dev.txt`
+## System View
+1. Telemetry and context data are ingested.
+2. Tools project near-term trajectory and compute risk/confidence.
+3. Orchestration logic routes to monitor, auto-notify, or human review.
+4. Outputs are exposed via API/CLI and observable in diagrams and traces.
 
-## Where Things Are Defined
-- `.[dev,api]` is defined in `pyproject.toml` under `[project.optional-dependencies]`.
-- `make` targets are defined in `Makefile`.
-- No Docker configuration is currently included (`Dockerfile` / `docker-compose.yml` are intentionally absent for now).
-- `requirements.txt` and `requirements-dev.txt` are provided for contributors who prefer `pip -r`.
+## Stakeholder Value
+- Safety: earlier detection and faster response windows.
+- Operations: consistent decision paths under load.
+- Governance: transparent, inspectable decision chains.
+- Evolution: architecture ready to integrate MCP/A2A-aligned services.
 
-## Why These Commands Exist
-The goal is to give contributors one consistent way to install, validate, and run the project.
+## Public Repository Structure
+- `src/altitude_warning/`: application logic
+- `data/`: raw, processed, and scenario datasets
+- `diagrams/`: architecture and state visuals
+- `docs/`: contributor and setup documentation
+- `notebooks/`: exploratory analysis artifacts
 
-| Command | Purpose |
-|---|---|
-| `python3 -m pip install -e '.[dev,api]'` | Installs the package in editable mode plus development tooling (`pytest`) and API runtime dependencies (`fastapi`, `uvicorn`). |
-| `make test` | Runs automated tests to verify core logic before changes are merged. |
-| `make run-cli` | Runs the command-line pipeline for quick functional validation and JSON output checks. |
-| `make run-api` | Starts the local API server for endpoint-level validation and integration testing. |
-
-No `.env` file is required at this stage; defaults are local and code-defined.
-
-## Quick Start
-1. `source .venv/bin/activate`
-2. `python3 -m pip install -e '.[dev,api]'`
-3. `make test`
-4. `make run-cli`
-5. `make run-api`
-
-## Project Layout
-- `src/altitude_warning/`: core package
-- `data/`: raw/processed/scenario data
-- `diagrams/`: architecture and state diagrams
-- `specs/`: design notes, plans, and reference material
+## For Contributors
+- Local setup and run instructions: `docs/PYTHON_SETUP.md`
+- Data schema and assumptions: `docs/data_schema.md`
+- Code comment conventions: `docs/CODE_COMMENT_GUIDELINES.md`

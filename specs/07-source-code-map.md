@@ -12,6 +12,9 @@ Purpose: quick orientation for public contributors on what each source file does
 | `src/altitude_warning/simulator.py` | Deterministic telemetry scenario generator used for repeatable local runs. |
 | `src/altitude_warning/cli.py` | Command-line runner that executes the pipeline and prints structured JSON outputs. |
 | `src/altitude_warning/api.py` | Optional FastAPI interface exposing health and simulation-injection endpoints. |
+| `src/altitude_warning/data/contract.py` | Dataset schema contracts for raw telemetry, processed telemetry, and model feature tables. |
+| `src/altitude_warning/data/pipeline.py` | Deterministic data generation and transformation pipeline (`raw -> processed -> features`). |
+| `src/altitude_warning/data_pipeline.py` | CLI entry point wrapper for running the data pipeline module. |
 
 ## Runtime Flow
 1. `simulator.py` creates telemetry events.

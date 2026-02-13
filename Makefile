@@ -1,10 +1,13 @@
-.PHONY: test run-cli run-api
+.PHONY: test build-data run-cli run-api
 
 test:
 	PYTHONPATH=src python3 -m pytest -q
 
-run-cli:
+run-cli: build-data
 	./scripts/run_cli.sh
 
-run-api:
+run-api: build-data
 	./scripts/run_api.sh
+
+build-data:
+	./scripts/build_data.sh

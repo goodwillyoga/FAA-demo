@@ -17,6 +17,11 @@ api = [
 dev = [
   "pytest>=8.0"
 ]
+analysis = [
+  "jupyter>=1.0",
+  "matplotlib>=3.8",
+  "pandas>=2.2"
+]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
