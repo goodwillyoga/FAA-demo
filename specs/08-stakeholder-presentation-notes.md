@@ -39,6 +39,12 @@ This system layers an autonomous orchestration and tool-calling control plane ov
 6. Observability and measurable outcomes
 7. Expansion roadmap and standards alignment
 
+## Walkthrough Reference
+- Use `docs/simulation_setup.md` as the canonical scenario walkthrough for:
+- drone start/end states,
+- ceiling differences (`300 ft` vs `400 ft`),
+- climb differential and resulting risk narrative.
+
 ## Tooling Notes for Converting Markdown to Presentation Assets
 - Figma free tier:
   - good for mockups and narrative framing
@@ -47,4 +53,3 @@ This system layers an autonomous orchestration and tool-calling control plane ov
   - `Marp` (Markdown-first slide generation)
   - `Pandoc` + PowerPoint template
   - browser-based reveal.js frameworks
-

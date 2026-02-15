@@ -1,4 +1,7 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import Any
+
+from pydantic import BaseModel, Field
 
 
 @dataclass(slots=True)
@@ -17,8 +20,29 @@ class RiskAssessment:
     ceiling_ft: float
     risk_score: float
     confidence: float
-    route: str
+    route: str | None = None
+    should_alert: bool | None = None
+
+
+@dataclass(slots=True)
+class TraceStep:
+    name: str
+    inputs: dict[str, Any] = field(default_factory=dict)
+    outputs: dict[str, Any] = field(default_factory=dict)
+    duration_ms: float = 0.0
+
+
+class RouteDecision(BaseModel):
+    route: str = Field(..., description="auto_notify | hitl_review | monitor")
     should_alert: bool
+    rationale: str
+
+
+class LLMAssessment(BaseModel):
+    predicted_altitude_ft: float
+    ceiling_ft: float
+    risk_score: float
+    confidence: float
 
 
 @dataclass(slots=True)
@@ -29,3 +53,6 @@ class AlertDecision:
     route: str
     risk_score: float
     confidence: float
+    rationale: str | None = None
+    trace_id: str | None = None
+    trace: list[dict[str, Any]] | None = None

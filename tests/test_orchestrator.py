@@ -1,9 +1,17 @@
+from langchain_core.language_models.fake import FakeListLLM
+
 from altitude_warning.models import TelemetryEvent
 from altitude_warning.orchestrator import Orchestrator
 
 
 def test_orchestrator_emits_alert_for_projected_breach() -> None:
-    orch = Orchestrator()
+    llm = FakeListLLM(
+        responses=[
+            '{"predicted_altitude_ft":308.0,"ceiling_ft":300.0,"risk_score":0.85,"confidence":0.7}',
+            '{"route":"auto_notify","should_alert":true,"rationale":"Projected ceiling breach."}',
+        ]
+    )
+    orch = Orchestrator(llm=llm)
     event = TelemetryEvent(
         drone_id="D-1",
         lat=37.62,
@@ -14,4 +22,5 @@ def test_orchestrator_emits_alert_for_projected_breach() -> None:
     )
     decision, assessment, _latency_ms = orch.process_event(event)
     assert decision.status == "alerted"
+    assert decision.route == "auto_notify"
     assert assessment.predicted_altitude_ft > assessment.ceiling_ft

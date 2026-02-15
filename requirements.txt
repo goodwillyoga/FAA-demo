@@ -4,3 +4,7 @@ pytest>=8.0
 jupyter>=1.0
 matplotlib>=3.8
 pandas>=2.2
+langchain>=0.2
+langchain-openai>=0.1.10
+langgraph>=0.2.20
+langsmith>=0.1.130

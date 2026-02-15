@@ -2,15 +2,12 @@ stateDiagram-v2
     [*] --> EventReceived
     EventReceived --> ValidateTelemetry
     ValidateTelemetry --> InvalidData: schema fail
-    ValidateTelemetry --> CeilingLookup: valid
+    ValidateTelemetry --> LLMAssessRisk: valid
 
-    CeilingLookup --> TrajectoryProjection
-    TrajectoryProjection --> RiskScoring
-    RiskScoring --> NoAlert: risk < threshold
-    RiskScoring --> AlertDrafted: risk >= threshold
-
-    AlertDrafted --> AutoNotify: confidence high
-    AlertDrafted --> HITLReview: confidence low or severity high
+    LLMAssessRisk --> LLMRouteDecision
+    LLMRouteDecision --> AutoNotify: route auto_notify
+    LLMRouteDecision --> HITLReview: route hitl_review
+    LLMRouteDecision --> Monitoring: should_alert false
 
     HITLReview --> OperatorNotified: approve
     HITLReview --> Monitoring: override
@@ -21,6 +18,6 @@ stateDiagram-v2
     Monitoring --> BreachConfirmed: ceiling crossed
 
     InvalidData --> [*]
-    NoAlert --> [*]
+    Monitoring --> [*]
     Resolved --> [*]
     BreachConfirmed --> [*]

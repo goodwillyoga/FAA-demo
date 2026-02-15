@@ -38,3 +38,4 @@ This project shows how an agentic orchestration layer can sit on top of existing
 - Local setup and run instructions: `docs/PYTHON_SETUP.md`
 - Data schema and assumptions: `docs/data_schema.md`
 - Code comment conventions: `docs/CODE_COMMENT_GUIDELINES.md`
+- FAA walkthrough narrative for simulation assumptions: `docs/simulation_setup.md`

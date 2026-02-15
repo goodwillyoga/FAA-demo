@@ -1,3 +1,5 @@
+from langchain_core.tools import tool
+
 from altitude_warning.config import THRESHOLDS
 
 
@@ -37,3 +39,19 @@ def policy_tool(risk_score: float, confidence: float) -> tuple[str, bool]:
             return "auto_notify", True
         return "hitl_review", True
     return "monitor", False
+
+
+@tool("ceiling_tool")
+def lc_ceiling_tool(lat: float, lon: float) -> float:
+    """Return a simulated ceiling in feet for the location."""
+    return ceiling_tool(lat, lon)
+
+
+@tool("trajectory_tool")
+def lc_trajectory_tool(current_altitude_ft: float, vertical_speed_fps: float, horizon_seconds: int | None = None) -> float:
+    """Project altitude forward using a fixed horizon."""
+    return trajectory_tool(current_altitude_ft, vertical_speed_fps, horizon_seconds)
+
+
+def get_langchain_tools() -> list:
+    return [lc_ceiling_tool, lc_trajectory_tool]
