@@ -11,7 +11,7 @@ def test_orchestrator_emits_alert_for_projected_breach() -> None:
             '{"route":"auto_notify","risk_band":"HIGH","should_alert":true,"rationale":"Projected ceiling breach."}',
         ]
     )
-    orch = Orchestrator(llm=llm)
+    orch = Orchestrator(llm=llm, enable_policy_retrieval=False)
     event = TelemetryEvent(
         drone_id="D-1",
         lat=37.62,
@@ -20,7 +20,8 @@ def test_orchestrator_emits_alert_for_projected_breach() -> None:
         vertical_speed_fps=3.5,
         timestamp_iso="2026-02-13T00:00:00Z",
     )
-    decision, assessment, _latency_ms = orch.process_event(event)
+    decision, assessment, policy_context, _latency_ms = orch.process_event(event)
     assert decision.status == "alerted"
     assert decision.route == "auto_notify"
     assert assessment.predicted_altitude_ft > assessment.ceiling_ft
+    assert policy_context == []

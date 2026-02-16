@@ -35,6 +35,13 @@ Then ingest:
 bash scripts/ingest_policy.sh
 ```
 
+### Enable Verbose Logging (Optional)
+To capture retriever/LLM rerank logs, export the logging level before running tests:
+```
+source scripts/enable_logging.sh
+```
+Then run the desired pytest or CLI command in the same shell.
+
 ## 4) Run Setup Tests (Optional)
 ```
 pytest tests/test_weaviate_setup.py tests/test_policy_ingest.py
@@ -47,7 +54,15 @@ Notes:
 Open the notebook and run all cells:
 - notebooks/01_data_eda.ipynb
 
-## 6) Next Steps (Keep Updated)
-- Add policy retrieval into the agent
+## 6) Orchestrator Baseline (gpt-4o)
+Run the baseline scenario and write results to `outputs/baseline_results.json`:
+```
+source scripts/set_openai_key.sh
+python scripts/run_orchestrator_baseline.py
+```
+Notes:
+- Ensure Weaviate is running and the policy guide is ingested if policy retrieval is enabled.
+
+## 7) Next Steps (Keep Updated)
 - Wire the minimal dashboard
 - Update this runbook as new steps are added

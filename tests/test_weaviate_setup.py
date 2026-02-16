@@ -35,8 +35,15 @@ def test_policy_collection_setup() -> None:
         if total_count:
             sample = collection.query.fetch_objects(limit=3)
             for idx, obj in enumerate(sample.objects, start=1):
-                text = (obj.properties.get("text") or "").strip()
+                props = obj.properties or {}
+                text = (props.get("text") or "").strip()
                 preview = " ".join(text.split())[:200]
-                print(f"Sample {idx}: {preview}")
+                structure = props.get("structure") or "(missing)"
+                section_title = props.get("section_title") or ""
+                assert "structure" in props
+                assert "section_title" in props
+                print(
+                    f"Sample {idx} [structure={structure} section={section_title}]: {preview}"
+                )
     finally:
         client.close()

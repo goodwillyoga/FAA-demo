@@ -49,7 +49,7 @@ def inject_altitude_breach(
 
     out: list[dict[str, str | float | list[dict[str, str | float]] | None]] = []
     for event in events:
-        decision, assessment, latency_ms = orchestrator.process_event(event)
+        decision, assessment, _policy_context, latency_ms = orchestrator.process_event(event)
         payload: dict[str, str | float | list[dict[str, str | float]] | None] = {
             "drone_id": decision.drone_id,
             "route": decision.route,

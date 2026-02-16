@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import re
 from pathlib import Path
 from typing import Callable, Iterable, Sequence
 
@@ -17,6 +18,39 @@ class PolicyChunk:
     source: str
     page: int
     chunk_index: int
+    section_title: str | None = None
+    structure: str = "body"
+
+
+_SECTION_PATTERN = re.compile(r"^(chapter|appendix|section)\\b", re.IGNORECASE)
+
+
+def _guess_section_title(text: str) -> str | None:
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        if _SECTION_PATTERN.match(line):
+            return line
+        if line.isupper() and 4 <= len(line) <= 80:
+            return line
+    return None
+
+
+def _detect_structure_label(text: str) -> str:
+    lowered = text.lower()
+    if "table of contents" in lowered:
+        return "toc"
+    leading = lowered[:200]
+    if leading.startswith("appendix") or leading.startswith("appendices"):
+        return "appendix"
+    if " appendix" in leading:
+        return "appendix"
+    if "acr" in lowered and "definition" in lowered:
+        return "reference"
+    if "glossary" in lowered:
+        return "reference"
+    return "body"
 
 
 def load_pdf_pages(path: Path) -> list[tuple[int, str]]:
@@ -53,6 +87,8 @@ def build_chunks(pages: Iterable[tuple[int, str]], source: str) -> list[PolicyCh
                     source=source,
                     page=page_number,
                     chunk_index=chunk_index,
+                    section_title=_guess_section_title(chunk),
+                    structure=_detect_structure_label(chunk),
                 )
             )
             chunk_index += 1
@@ -122,6 +158,8 @@ def ingest_policy_pdf(
             "source": chunk.source,
             "page": chunk.page,
             "chunk_index": chunk.chunk_index,
+            "section_title": chunk.section_title or "",
+            "structure": chunk.structure,
         }
         for chunk in chunks
     ]

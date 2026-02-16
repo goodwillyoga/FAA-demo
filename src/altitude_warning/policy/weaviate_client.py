@@ -67,5 +67,7 @@ def ensure_policy_collection(
             Property(name="source", data_type=DataType.TEXT),
             Property(name="page", data_type=DataType.INT),
             Property(name="chunk_index", data_type=DataType.INT),
+            Property(name="section_title", data_type=DataType.TEXT),
+            Property(name="structure", data_type=DataType.TEXT),
         ],
     )

@@ -26,3 +26,6 @@ analysis = [
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
+markers = [
+  "integration: runs tests that call external services",
+]

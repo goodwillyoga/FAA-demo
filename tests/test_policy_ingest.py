@@ -29,8 +29,20 @@ def test_ingest_texts_into_weaviate() -> None:
     try:
         texts = ["Section 107.51 altitude limits.", "Section 107.23 operational limits."]
         metadata = [
-            {"source": "unit-test", "page": 1, "chunk_index": 0},
-            {"source": "unit-test", "page": 2, "chunk_index": 1},
+            {
+                "source": "unit-test",
+                "page": 1,
+                "chunk_index": 0,
+                "section_title": "Section 107.51",
+                "structure": "body",
+            },
+            {
+                "source": "unit-test",
+                "page": 2,
+                "chunk_index": 1,
+                "section_title": "Section 107.23",
+                "structure": "body",
+            },
         ]
         count = ingest_texts(
             texts,

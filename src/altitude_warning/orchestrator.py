@@ -2,7 +2,7 @@ import json
 import os
 from dataclasses import asdict
 from time import perf_counter
-from typing import Any, TypedDict
+from typing import Any, Sequence, TypedDict
 from uuid import uuid4
 
 from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
@@ -18,12 +18,15 @@ from altitude_warning.models import (
     TelemetryEvent,
     TraceStep,
 )
+from altitude_warning.policy.retriever import retrieve_policy_context
+from altitude_warning.prompts import ASSESS_SYSTEM_PROMPT, DECIDE_HUMAN_PROMPT, DECIDE_SYSTEM_PROMPT
 from altitude_warning.tools import get_langchain_tools
 
 
 class OrchestratorState(TypedDict):
     event: TelemetryEvent
     assessment: RiskAssessment | None
+    policy_context: list[str]
     llm_decision: RouteDecision | None
     decision: AlertDecision | None
     trace: list[TraceStep]
@@ -33,33 +36,35 @@ class OrchestratorState(TypedDict):
 class Orchestrator:
     """Agentic orchestration path powered by LangGraph + LangChain."""
 
-    def __init__(self, llm: Any | None = None, trace_enabled: bool = False, model_name: str | None = None) -> None:
+    _ALLOWED_RISK_BANDS = {"LOW", "MED", "HIGH"}
+    _ALLOWED_ROUTES = {"auto_notify", "hitl_review", "monitor"}
+
+    def __init__(
+        self,
+        llm: Any | None = None,
+        trace_enabled: bool = False,
+        model_name: str | None = None,
+        enable_policy_retrieval: bool = True,
+    ) -> None:
         self.trace_enabled = trace_enabled
+        self.enable_policy_retrieval = enable_policy_retrieval
         resolved_model = model_name or os.getenv("OPENAI_MODEL", "gpt-4o-mini")
         self.llm = llm or ChatOpenAI(model=resolved_model, temperature=0)
         self.tools = get_langchain_tools()
         self.tools_by_name = {tool.name: tool for tool in self.tools}
         self.llm_with_tools = self.llm.bind_tools(self.tools) if hasattr(self.llm, "bind_tools") else self.llm
-        self.assess_prompt = (
-            "You are an FAA safety agent. Use tools to compute ceiling and projected altitude. "
-            "Then compute risk score and confidence yourself based on those values and the telemetry. "
-            "Call tools as needed. When done, respond ONLY with a JSON object: "
-            "{\"predicted_altitude_ft\": number, \"ceiling_ft\": number, "
-            "\"risk_score\": number, \"confidence\": number}."
-        )
+        self.policy_llm_rerank = os.getenv("POLICY_LLM_RERANK", "0").lower() not in {"0", "false", ""}
+        self.policy_rerank_model = os.getenv("POLICY_RERANK_MODEL", "gpt-4o-mini")
+        self.assess_prompt = ASSESS_SYSTEM_PROMPT
         self.prompt = ChatPromptTemplate.from_messages(
             [
                 (
                     "system",
-                    "You are an FAA safety agent. Decide the next route for a drone safety event. "
-                    "Return a JSON object with: route (auto_notify | hitl_review | monitor), "
-                    "risk_band (LOW | MED | HIGH), should_alert (true/false), and rationale (short).",
+                    DECIDE_SYSTEM_PROMPT,
                 ),
                 (
                     "human",
-                    "Telemetry: altitude_ft={altitude_ft}, vertical_speed_fps={vertical_speed_fps}. "
-                    "Projection: predicted_altitude_ft={predicted_altitude_ft}, ceiling_ft={ceiling_ft}. "
-                    "Risk: risk_score={risk_score}, confidence={confidence}.",
+                    DECIDE_HUMAN_PROMPT,
                 ),
             ]
         )
@@ -74,13 +79,68 @@ class Orchestrator:
     def _build_graph(self) -> Any:
         graph = StateGraph(OrchestratorState)
         graph.add_node("assess_risk", self._assess_risk)
+        graph.add_node("retrieve_policy", self._retrieve_policy)
         graph.add_node("decide_route", self._decide_route)
         graph.add_node("emit_decision", self._emit_decision)
-        graph.add_edge("assess_risk", "decide_route")
+        graph.add_edge("assess_risk", "retrieve_policy")
+        graph.add_edge("retrieve_policy", "decide_route")
         graph.add_edge("decide_route", "emit_decision")
         graph.add_edge("emit_decision", END)
         graph.set_entry_point("assess_risk")
         return graph.compile()
+
+    def _format_policy_context(self, snippets: Sequence[str]) -> str:
+        if not snippets:
+            return "None available"
+        return "\n".join(snippets)
+
+    def _has_citation(self, rationale: str) -> bool:
+        return "[S" in rationale
+
+    def _retrieve_policy(self, state: OrchestratorState) -> dict[str, Any]:
+        assessment = state["assessment"]
+        event = state["event"]
+        start = perf_counter()
+
+        if assessment is None or not self.enable_policy_retrieval:
+            trace = self._append_trace(
+                state["trace"],
+                "retrieve_policy",
+                {"enabled": self.enable_policy_retrieval},
+                {"policy_chunks": 0},
+                start,
+            )
+            return {"policy_context": [], "trace": trace}
+
+        query = (
+            "FAA Part 107 guidance for altitude limits and operational safety. "
+            f"Telemetry altitude_ft={event.altitude_ft}, vertical_speed_fps={event.vertical_speed_fps}, "
+            f"predicted_altitude_ft={assessment.predicted_altitude_ft:.1f}, ceiling_ft={assessment.ceiling_ft:.1f}."
+        )
+
+        policy_context: list[str] = []
+        error: str | None = None
+        try:
+            os.environ["POLICY_LLM_RERANK"] = "1" if self.policy_llm_rerank else "0"
+            os.environ["POLICY_RERANK_MODEL"] = self.policy_rerank_model
+            snippets = retrieve_policy_context(query)
+            for idx, snippet in enumerate(snippets, start=1):
+                text = " ".join(snippet.text.split())
+                policy_context.append(
+                    f"[S{idx}] [{snippet.source} p.{snippet.page}] {text}"
+                )
+        except Exception as exc:
+            error = str(exc)
+
+        trace = self._append_trace(
+            state["trace"],
+            "retrieve_policy",
+            {"query": query},
+            {"policy_chunks": len(policy_context), "error": error},
+            start,
+        )
+
+        return {"policy_context": policy_context, "trace": trace}
 
     def _append_trace(
         self,
@@ -97,6 +157,28 @@ class Orchestrator:
             *trace,
             TraceStep(name=name, inputs=inputs, outputs=outputs, duration_ms=round(duration_ms, 2)),
         ]
+
+    def _clamp_score(self, value: float) -> float:
+        return max(0.0, min(1.0, value))
+
+    def _guard_decision(self, decision: RouteDecision, fallback_risk_score: float) -> RouteDecision:
+        risk_band = decision.risk_band if decision.risk_band in self._ALLOWED_RISK_BANDS else "MED"
+        route = decision.route if decision.route in self._ALLOWED_ROUTES else "monitor"
+        should_alert = bool(decision.should_alert)
+        rationale = decision.rationale.strip() if decision.rationale else "Guardrail: no rationale provided."
+
+        if not self._has_citation(rationale):
+            rationale = f"Guardrail: missing citation. {rationale}"
+
+        if decision.risk_band != risk_band or decision.route != route:
+            rationale = f"Guardrail applied. {rationale}"
+
+        return RouteDecision(
+            route=route,
+            risk_band=risk_band,
+            should_alert=should_alert,
+            rationale=rationale,
+        )
 
     def _assess_risk(self, state: OrchestratorState) -> dict[str, Any]:
         event = state["event"]
@@ -129,12 +211,18 @@ class Orchestrator:
                 tool = self.tools_by_name.get(call["name"])
                 if tool is None:
                     raise ValueError(f"Unknown tool requested: {call['name']}")
-                result = tool.invoke(call["args"])
+                try:
+                    result = tool.invoke(call["args"])
+                except Exception as exc:
+                    raise RuntimeError(f"Tool invocation failed: {call['name']}") from exc
                 tool_log.append({"tool": call["name"], "args": call["args"], "result": result})
                 messages.append(
                     ToolMessage(content=json.dumps({"result": result}), tool_call_id=call["id"])
                 )
-            response = self.llm_with_tools.invoke(messages)
+            try:
+                response = self.llm_with_tools.invoke(messages)
+            except Exception as exc:
+                raise RuntimeError("LLM tool-followup failed") from exc
             messages.append(response)
 
         content = response.content if hasattr(response, "content") else response
@@ -147,8 +235,8 @@ class Orchestrator:
         assessment = RiskAssessment(
             predicted_altitude_ft=assessment_data.predicted_altitude_ft,
             ceiling_ft=assessment_data.ceiling_ft,
-            risk_score=assessment_data.risk_score,
-            confidence=assessment_data.confidence,
+            risk_score=self._clamp_score(assessment_data.risk_score),
+            confidence=self._clamp_score(assessment_data.confidence),
         )
 
         trace = self._append_trace(
@@ -175,6 +263,7 @@ class Orchestrator:
     def _decide_route(self, state: OrchestratorState) -> dict[str, Any]:
         assessment = state["assessment"]
         event = state["event"]
+        policy_context = state.get("policy_context", [])
         if assessment is None:
             raise ValueError("Missing assessment state")
 
@@ -185,10 +274,14 @@ class Orchestrator:
             "ceiling_ft": round(assessment.ceiling_ft, 2),
             "risk_score": round(assessment.risk_score, 3),
             "confidence": round(assessment.confidence, 3),
+            "policy_context": self._format_policy_context(policy_context),
         }
 
         start = perf_counter()
-        raw_decision = self.chain.invoke(payload)
+        try:
+            raw_decision = self.chain.invoke(payload)
+        except Exception as exc:
+            raise RuntimeError("LLM decision step failed") from exc
         if self.use_structured_output:
             llm_decision = raw_decision
         else:
@@ -198,6 +291,8 @@ class Orchestrator:
             except json.JSONDecodeError as exc:
                 raise ValueError(f"LLM routing response is not valid JSON: {content}") from exc
             llm_decision = RouteDecision.model_validate(decision_payload)
+        llm_decision = self._guard_decision(llm_decision, assessment.risk_score)
+
         trace = self._append_trace(
             state["trace"],
             "decide_route",
@@ -267,11 +362,14 @@ class Orchestrator:
 
         return {"decision": decision, "trace": trace}
 
-    def process_event(self, event: TelemetryEvent) -> tuple[AlertDecision, RiskAssessment, float]:
+    def process_event(
+        self, event: TelemetryEvent
+    ) -> tuple[AlertDecision, RiskAssessment, list[str], float]:
         start = perf_counter()
         initial_state: OrchestratorState = {
             "event": event,
             "assessment": None,
+            "policy_context": [],
             "llm_decision": None,
             "decision": None,
             "trace": [],
@@ -281,6 +379,7 @@ class Orchestrator:
         latency_ms = (perf_counter() - start) * 1000
         decision = final_state["decision"]
         assessment = final_state["assessment"]
+        policy_context = final_state.get("policy_context", [])
         if decision is None or assessment is None:
             raise ValueError("Missing decision output")
-        return decision, assessment, latency_ms
+        return decision, assessment, policy_context, latency_ms

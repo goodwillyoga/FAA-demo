@@ -1,0 +1,5 @@
+2026-02-16 00:32:21 INFO altitude_warning.policy.retriever policy_rerank.start
+2026-02-16 00:32:26 DEBUG altitude_warning.policy.retriever policy_rerank.raw content=```json
+{"scores":[{"id":1,"score":0,"reason":"irrelevant content about wildlife areas and tethered balloons"},{"id":2,"score":0,"reason":"table of contents, no relevant information"},{"id":3,"score":1,"reason":"tangential mention of altitude related to structures, not directly addressing query"},{"id":4,"score":1,"reason":"tangential mention of ceiling, not directly addressing altitude limits for operations"},{"id":5,"score":2,"reason":"strongly implies relevance to regulations and operational limits but lacks specifics"},{"id":6,"score":3,"reason":"directly states the need to be familiar with 14 CFR part 107, which includes altitude limits and operational safety"}]}
+```
+2026-02-16 00:32:26 INFO altitude_warning.policy.retriever policy_rerank.scores

@@ -34,7 +34,7 @@ def main() -> None:
     events = load_scenario_events(scenario_path) if scenario_path.exists() else generate_altitude_breach_events()
 
     for event in events:
-        decision, assessment, latency_ms = orchestrator.process_event(event)
+        decision, assessment, _policy_context, latency_ms = orchestrator.process_event(event)
         payload = {
             "drone_id": decision.drone_id,
             "route": decision.route,

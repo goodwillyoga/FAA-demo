@@ -61,7 +61,15 @@ python -c "from pathlib import Path; from altitude_warning.policy.ingest import 
 - Embeddings: `text-embedding-3-small` (1536 dims)
 - Chunking: 350-word chunks with 80-word overlap
 - Collection: `PolicyChunks`
-- Metadata stored per chunk: `source`, `page`, `chunk_index`
+- Metadata stored per chunk: `source`, `page`, `chunk_index`, `section_title`, `structure`
+	- `section_title` captures the detected heading inside the chunk so UI/reporting can show where guidance came from (we do **not** filter on it today).
+	- `structure` is a lightweight tag inferred from the text (`body`, `toc`, `appendix`, `reference`) so downstream retrieval can down-rank obviously non-operational sections without hardcoding specific pages.
+
+### Retrieval Heuristic
+- `retrieve_policy_context()` still performs semantic search via Weaviate, then re-ranks the candidate snippets by two signals: (1) altitude-specific keyword hits, (2) `structure` weight (body chunks preferred; TOC/appendix/reference are penalized but still eligible if they contain the best match).
+- This keeps the flow agentic—LLM still sees whatever tops the list—but reduces noisy citations from tables of contents or glossary-only chunks.
+- Optional LLM re-ranker: set `POLICY_LLM_RERANK=1` (and optionally `POLICY_RERANK_MODEL=gpt-4o-mini`) in `.env` to send the top ~6 snippets plus the telemetry-aware query to a lightweight LLM judge that scores each chunk (0–3) before final ordering. Leave it at `0` to avoid extra API calls.
+- When the reranker is enabled, detailed scores get logged to `logs/policy_rerank.log` (auto-created) so you can inspect which chunks were boosted or penalized.
 
 ### Tests
 Run Weaviate setup and ingestion tests (skips if Weaviate is not running):
