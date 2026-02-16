@@ -53,7 +53,9 @@ FEATURE_COLUMNS = [
     "predicted_altitude_ft_8s",  # 8-second altitude projection.
     "risk_score",  # Computed risk score (0..1).
     "confidence",  # Confidence score (0..1).
+    "risk_band",  # Risk band label emitted by the agent (LOW/MED/HIGH).
     "route",  # Decision path: monitor, auto_notify, or hitl_review.
+    "rationale",  # Agent rationale string tied to policy guidance.
     "ceiling_cross_within_8s",  # Binary label for projected crossing in 8 seconds.
     "time_to_ceiling_cross_sec",  # Estimated crossing time in seconds when applicable.
 ]
@@ -83,7 +85,9 @@ COLUMN_DESCRIPTIONS = {
     "predicted_altitude_ft_8s": "Projected altitude eight seconds after current timestamp.",
     "risk_score": "Risk output score in the range 0 to 1.",
     "confidence": "Confidence output score in the range 0 to 1.",
+    "risk_band": "Agent-assigned risk band label (LOW, MED, HIGH).",
     "route": "Policy route selected by decision logic.",
+    "rationale": "Agent-provided rationale grounded in policy context.",
     "ceiling_cross_within_8s": "Binary target indicating projected ceiling crossing in eight seconds.",
     "time_to_ceiling_cross_sec": "Projected seconds to ceiling crossing when crossing is expected soon.",
 }

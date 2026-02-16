@@ -40,6 +40,7 @@ def main() -> None:
             "route": decision.route,
             "status": decision.status,
             "message": decision.message,
+            "risk_band": decision.risk_band,
             "rationale": decision.rationale,
             "risk_score": round(decision.risk_score, 3),
             "confidence": round(decision.confidence, 3),

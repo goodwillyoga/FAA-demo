@@ -66,7 +66,9 @@ I prepare these model-ready fields for scoring and analysis:
 | `predicted_altitude_ft_8s` | I use projected altitude to estimate near-term crossing risk. |
 | `risk_score` | I use this bounded score (`0..1`) as the model/rule risk output. |
 | `confidence` | I use this bounded score (`0..1`) to indicate decision certainty. |
+| `risk_band` | I use this agent-assigned label (`LOW/MED/HIGH`) to summarize risk severity. |
 | `route` | I use this to represent policy path (`monitor`, `auto_notify`, `hitl_review`). |
+| `rationale` | I use this agent-provided summary to explain the decision in plain language. |
 | `ceiling_cross_within_8s` | I use this binary target to label near-term crossing events. |
 | `time_to_ceiling_cross_sec` | I use this target to estimate crossing lead time when crossing is expected soon. |
 

@@ -89,19 +89,21 @@ def generate_raw_data(base_dir: Path, duration_seconds: int = 120) -> tuple[Path
             ts_iso = _to_iso(ts)
 
             if cfg["drone_id"] == "D-2001":
-                if second < 35:
-                    vertical_speed_fps = 1.2
-                elif second < 75:
-                    vertical_speed_fps = 2.1
-                else:
-                    vertical_speed_fps = 3.4
-            else:
-                if second < 60:
-                    vertical_speed_fps = 0.7
+                # Fast-climb window to create a clear risk divergence.
+                if second < 40:
+                    vertical_speed_fps = 1.0
+                elif second < 70:
+                    vertical_speed_fps = 2.0
                 elif second < 95:
-                    vertical_speed_fps = 2.6
+                    vertical_speed_fps = 4.2
                 else:
-                    vertical_speed_fps = 1.1
+                    vertical_speed_fps = 2.2
+            else:
+                # Baseline steady climb to contrast with the fast-climb drone.
+                if second < 80:
+                    vertical_speed_fps = 0.9
+                else:
+                    vertical_speed_fps = 1.2
 
             # Add smooth movement variation to avoid unrealistic constant-speed traces.
             ground_speed_fps = 14.0 + 1.8 * math.sin(second / 12.0)
@@ -246,7 +248,9 @@ def build_feature_data(base_dir: Path, processed_path: Path) -> Path:
                     "predicted_altitude_ft_8s": round(predicted_altitude_ft_8s, 3),
                     "risk_score": round(risk_score, 4),
                     "confidence": round(confidence, 4),
+                    "risk_band": "",
                     "route": route,
+                    "rationale": "",
                     "ceiling_cross_within_8s": cross_within_8s,
                     "time_to_ceiling_cross_sec": time_to_ceiling_cross_sec,
                 }

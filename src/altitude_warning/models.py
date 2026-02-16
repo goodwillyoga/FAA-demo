@@ -34,6 +34,7 @@ class TraceStep:
 
 class RouteDecision(BaseModel):
     route: str = Field(..., description="auto_notify | hitl_review | monitor")
+    risk_band: str = Field(..., description="LOW | MED | HIGH")
     should_alert: bool
     rationale: str
 
@@ -51,6 +52,7 @@ class AlertDecision:
     status: str
     message: str
     route: str
+    risk_band: str
     risk_score: float
     confidence: float
     rationale: str | None = None

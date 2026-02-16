@@ -39,3 +39,32 @@ This project shows how an agentic orchestration layer can sit on top of existing
 - Data schema and assumptions: `docs/data_schema.md`
 - Code comment conventions: `docs/CODE_COMMENT_GUIDELINES.md`
 - FAA walkthrough narrative for simulation assumptions: `docs/simulation_setup.md`
+
+## Weaviate Policy Index (Part 107 Study Guide)
+This demo uses a single policy source for retrieval: `docs/faa_guides/remote_pilot_study_guide.pdf`.
+
+### Docker Start
+1) Start Weaviate locally:
+```
+bash scripts/run_weaviate.sh
+```
+2) Confirm it responds at `http://localhost:8080`.
+
+### Ingest Policy PDF
+Set your OpenAI key, then run ingestion:
+```
+export OPENAI_API_KEY=your_key
+python -c "from pathlib import Path; from altitude_warning.policy.ingest import ingest_policy_pdf; print(ingest_policy_pdf(Path('docs/faa_guides/remote_pilot_study_guide.pdf')))"
+```
+
+### Ingestion Parameters (High Level)
+- Embeddings: `text-embedding-3-small` (1536 dims)
+- Chunking: 350-word chunks with 80-word overlap
+- Collection: `PolicyChunks`
+- Metadata stored per chunk: `source`, `page`, `chunk_index`
+
+### Tests
+Run Weaviate setup and ingestion tests (skips if Weaviate is not running):
+```
+pytest tests/test_weaviate_setup.py tests/test_policy_ingest.py
+```

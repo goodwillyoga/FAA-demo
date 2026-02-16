@@ -53,7 +53,7 @@ class Orchestrator:
                     "system",
                     "You are an FAA safety agent. Decide the next route for a drone safety event. "
                     "Return a JSON object with: route (auto_notify | hitl_review | monitor), "
-                    "should_alert (true/false), and rationale (short).",
+                    "risk_band (LOW | MED | HIGH), should_alert (true/false), and rationale (short).",
                 ),
                 (
                     "human",
@@ -204,6 +204,7 @@ class Orchestrator:
             payload,
             {
                 "route": llm_decision.route,
+                "risk_band": llm_decision.risk_band,
                 "should_alert": llm_decision.should_alert,
                 "rationale": llm_decision.rationale,
             },
@@ -256,6 +257,7 @@ class Orchestrator:
             status=status,
             message=message,
             route=llm_decision.route,
+            risk_band=llm_decision.risk_band,
             risk_score=assessment.risk_score,
             confidence=assessment.confidence,
             rationale=llm_decision.rationale,

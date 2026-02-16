@@ -8,7 +8,7 @@ def test_orchestrator_emits_alert_for_projected_breach() -> None:
     llm = FakeListLLM(
         responses=[
             '{"predicted_altitude_ft":308.0,"ceiling_ft":300.0,"risk_score":0.85,"confidence":0.7}',
-            '{"route":"auto_notify","should_alert":true,"rationale":"Projected ceiling breach."}',
+            '{"route":"auto_notify","risk_band":"HIGH","should_alert":true,"rationale":"Projected ceiling breach."}',
         ]
     )
     orch = Orchestrator(llm=llm)
