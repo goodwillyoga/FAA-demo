@@ -15,6 +15,18 @@ This project shows how an agentic orchestration layer can sit on top of existing
 - Human-in-the-loop escalation path for high-risk or low-confidence decisions.
 - Technical traceability for review, replay, and governance.
 
+## 🚀 FAA Demo: Start Here
+**For a complete walkthrough of the system, 5 test scenarios, tool specifications, and routing rules, see:**
+→ **[docs/FAA_DEMO_GUIDE.md](docs/FAA_DEMO_GUIDE.md)**
+
+This guide includes:
+- System architecture diagram and data flow
+- **Tool suite** with deterministic risk calculations (ceiling, trajectory, risk scoring, visibility)
+- **5 FAA-guided test scenarios** (HIGH/MEDIUM/LOW risk with test results)
+- **Policy integration** via Weaviate RAG and 14 CFR Part 107 citations
+- **HITL approval flow** and decision traces
+- Quick start: run all scenarios with `pytest tests/test_orchestrator_scenario_sweep.py -v`
+
 ## System View
 1. Telemetry and context data are ingested.
 2. Tools project near-term trajectory and compute risk/confidence.

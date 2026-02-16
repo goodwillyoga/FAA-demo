@@ -61,6 +61,9 @@ def test_orchestrator_with_real_model() -> None:
         writer.writerow({**request_payload, **response_payload})
     print(f"Saved baseline to: {csv_path}")
 
+    assert policy_context is not None  # Should have [S1], [S2]... chunks
+    assert len(policy_context) > 0, "Policy context should be retrieved with Weaviate"
+
     assert 0.0 <= decision.risk_score <= 1.0
     assert 0.0 <= decision.confidence <= 1.0
     assert decision.route in {"auto_notify", "hitl_review", "monitor"}
@@ -70,3 +73,6 @@ def test_orchestrator_with_real_model() -> None:
 
     assert assessment.predicted_altitude_ft > 0
     assert assessment.ceiling_ft > 0
+
+    if decision.route == "hitl_review":
+        print(f"✓ HITL triggered: risk={decision.risk_score:.2f}, confidence={decision.confidence:.2f}")

@@ -1,6 +1,28 @@
 # Runbook
 
-This runbook tracks the end-to-end steps for the local demo workflow.
+This runbook tracks the end-to-end steps for the FAA altitude early warning demo.
+
+## 📋 For FAA Stakeholders & Demo Attendees
+**Start here:** [FAA_DEMO_GUIDE.md](FAA_DEMO_GUIDE.md) — Complete system overview, tool specifications, test scenarios, and results.
+
+---
+
+## Setup (One-Time)
+
+### Quick Start
+Run this script to configure everything in one go:
+```
+source scripts/demo_faa_setup.sh
+```
+
+This sets up:
+- Bash history formatting (HISTTIMEFORMAT fix)
+- Project directory
+- Python venv activation
+- OpenAI API key
+- Logging infrastructure
+
+---
 
 ## 1) Build Data Artifacts (Raw -> Processed -> Features)
 Generate deterministic datasets for two drones:
@@ -48,13 +70,33 @@ pytest tests/test_weaviate_setup.py tests/test_policy_ingest.py
 ```
 Notes:
 - Use `-s` if you want to see printed chunk counts and previews.
-- Verified locally on 2026-02-15.
+- Verified locally on 2026-02-16.
 
-## 5) EDA Notebook (Optional)
+## 5) Run FAA Demo Scenarios (Main Event!)
+Execute all 5 test scenarios with live LLM calls:
+```
+pytest tests/test_orchestrator_scenario_sweep.py -v
+```
+
+**Output:** Baseline CSV file in `outputs/scenario_sweep_baseline_YYYYMMDDTHHMMSSZ.csv` with decision routes, risk scores, policy chunks retrieved, and latencies for all 5 scenarios.
+
+**Expected Results:** 5/5 PASSED
+- Scenario 1 (HIGH - ceiling breach + wind): route=hitl_review | auto_notify ✅
+- Scenario 2 (HIGH - narrow margin + poor visibility): route=hitl_review ✅
+- Scenario 3 (HIGH - very close to ceiling + extreme wind): route=hitl_review | auto_notify ✅
+- Scenario 4 (MEDIUM - steady climb, good conditions): route=monitor | auto_notify ✅
+- Scenario 5 (LOW - stable flight): route=monitor ✅
+
+### Run Single Scenario
+```
+pytest tests/test_orchestrator_scenario_sweep.py::test_scenario_sweep_with_live_llm[data/scenarios/feature1_highriskceilingbreach_gustywind.json-HIGH-expected_route_in0] -v -s
+```
+
+## 6) EDA Notebook (Optional)
 Open the notebook and run all cells:
 - notebooks/01_data_eda.ipynb
 
-## 6) Orchestrator Baseline (gpt-4o)
+## 7) Orchestrator Baseline (gpt-4o)
 Run the baseline scenario and write results to `outputs/baseline_results.json`:
 ```
 source scripts/set_openai_key.sh
@@ -63,6 +105,34 @@ python scripts/run_orchestrator_baseline.py
 Notes:
 - Ensure Weaviate is running and the policy guide is ingested if policy retrieval is enabled.
 
-## 7) Next Steps (Keep Updated)
-- Wire the minimal dashboard
-- Update this runbook as new steps are added
+---
+
+## Troubleshooting
+
+### "HISTTIMEFORMAT: unbound variable" error
+Run: `source scripts/demo_faa_setup.sh` to fix shell configuration.
+
+### Weaviate not responding
+```
+# Check if running
+docker ps | grep weaviate
+
+# Restart
+bash scripts/run_weaviate.sh
+```
+
+### Policy ingestion failed
+```
+# Check OpenAI key
+echo $OPENAI_API_KEY
+
+# Re-ingest
+bash scripts/ingest_policy.sh
+```
+
+---
+
+## Next Steps
+- Deploy operator dashboard (Streamlit)
+- Async HITL with approval timeout
+- Real weather/ceiling APIs (production)

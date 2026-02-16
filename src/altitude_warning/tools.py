@@ -53,5 +53,36 @@ def lc_trajectory_tool(current_altitude_ft: float, vertical_speed_fps: float, ho
     return trajectory_tool(current_altitude_ft, vertical_speed_fps, horizon_seconds)
 
 
+@tool("risk_tool")
+def lc_risk_tool(predicted_altitude_ft: float, ceiling_ft: float, vertical_speed_fps: float) -> dict:
+    """Compute risk_score and confidence based on ceiling margin and climb rate."""
+    risk_score, confidence = risk_tool(predicted_altitude_ft, ceiling_ft, vertical_speed_fps)
+    return {"risk_score": risk_score, "confidence": confidence}
+
+
+@tool("visibility_tool")
+def lc_visibility_tool(visibility_km: float) -> dict:
+    """Assess visibility impact on flight safety and confidence reduction."""
+    if visibility_km < 1.0:
+        impact = "critical"
+        confidence_reduction = 0.35  # Reduce confidence significantly
+    elif visibility_km < 3.0:
+        impact = "poor"
+        confidence_reduction = 0.20  # Moderate confidence reduction
+    elif visibility_km < 5.0:
+        impact = "marginal"
+        confidence_reduction = 0.10  # Small confidence reduction
+    else:
+        impact = "good"
+        confidence_reduction = 0.0
+    
+    return {
+        "impact": impact,
+        "visibility_km": visibility_km,
+        "confidence_reduction": confidence_reduction,
+        "guidance": f"Visibility {visibility_km}km classified as {impact}. Apply {confidence_reduction:.0%} confidence penalty."
+    }
+
+
 def get_langchain_tools() -> list:
-    return [lc_ceiling_tool, lc_trajectory_tool]
+    return [lc_ceiling_tool, lc_trajectory_tool, lc_risk_tool, lc_visibility_tool]

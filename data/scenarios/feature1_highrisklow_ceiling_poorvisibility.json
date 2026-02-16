@@ -1,0 +1,36 @@
+{
+  "scenario_id": "feature1_highrisklow_ceiling_poorvisibility",
+  "description": "HIGH RISK: Drone D-0002 at 280ft climbing toward 300ft ceiling with poor visibility (2.5km) and wind",
+  "risk_category": "HIGH",
+  "faa_guidance": "14 CFR 107.19 + visibility rules. Already at 280ft with 300ft ceiling = 20ft margin, poor visibility 2.5km = HIGH RISK",
+  "events": [
+    {
+      "drone_id": "D-0002",
+      "lat": 37.65,
+      "lon": -122.40,
+      "altitude_ft": 280.0,
+      "vertical_speed_fps": 3.2,
+      "ground_speed_fps": 12.0,
+      "heading_deg": 45.0,
+      "wind_mps": 4.47,
+      "gust_mps": 6.71,
+      "wind_direction_deg": 220.0,
+      "visibility_km": 2.5,
+      "timestamp_iso": "2026-02-13T20:00:00Z"
+    },
+    {
+      "drone_id": "D-0002",
+      "lat": 37.65,
+      "lon": -122.40,
+      "altitude_ft": 289.0,
+      "vertical_speed_fps": 3.2,
+      "ground_speed_fps": 12.5,
+      "heading_deg": 50.0,
+      "wind_mps": 4.92,
+      "gust_mps": 7.15,
+      "wind_direction_deg": 225.0,
+      "visibility_km": 2.4,
+      "timestamp_iso": "2026-02-13T20:00:03Z"
+    }
+  ]
+}

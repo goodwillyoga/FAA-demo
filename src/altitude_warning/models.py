@@ -55,6 +55,7 @@ class AlertDecision:
     risk_band: str
     risk_score: float
     confidence: float
+    should_alert: bool
     rationale: str | None = None
     trace_id: str | None = None
     trace: list[dict[str, Any]] | None = None

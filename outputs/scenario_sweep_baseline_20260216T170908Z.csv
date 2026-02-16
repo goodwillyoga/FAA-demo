@@ -1,0 +1,2 @@
+scenario_id,risk_category,drone_id,altitude_ft,ceiling_ft,vertical_speed_fps,wind_mps,gust_mps,visibility_km,route,risk_band,risk_score,confidence,should_alert,policy_chunks_retrieved,latency_ms,rationale
+feature1_mediumrisk_steady_climb,MEDIUM,D-0001,260.0,300.0,1.5,N/A,N/A,N/A,monitor,LOW,0.487,0.637,False,3,11454,"The risk score of 0.487 indicates a low risk, and the confidence level of 0.637 does not warrant imm"
