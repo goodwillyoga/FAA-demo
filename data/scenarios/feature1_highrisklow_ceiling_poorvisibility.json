@@ -1,6 +1,6 @@
 {
   "scenario_id": "feature1_highrisklow_ceiling_poorvisibility",
-  "description": "HIGH RISK: Drone D-0002 at 280ft climbing toward 300ft ceiling with poor visibility (2.5km) and wind",
+  "description": "HIGH RISK: Unmanned aircraft D-0002 at 280ft climbing toward 300ft ceiling with poor visibility (2.5km) and wind",
   "risk_category": "HIGH",
   "faa_guidance": "14 CFR 107.19 + visibility rules. Already at 280ft with 300ft ceiling = 20ft margin, poor visibility 2.5km = HIGH RISK",
   "events": [

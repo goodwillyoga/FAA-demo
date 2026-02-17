@@ -1,6 +1,6 @@
 {
   "scenario_id": "feature1_highriskrooftop_highwind",
-  "description": "HIGH RISK: Drone D-0003 at 290ft very close to 300ft ceiling with extreme high wind (6.7+ m/s gust 8.9+)",
+  "description": "HIGH RISK: Unmanned aircraft D-0003 at 290ft very close to 300ft ceiling with extreme high wind (6.7+ m/s gust 8.9+)",
   "risk_category": "HIGH",
   "faa_guidance": "14 CFR 107.19 + wind safety margin. At 290ft with 300ft = only 10ft margin + climb + extreme wind = imminent HIGH RISK",
   "events": [

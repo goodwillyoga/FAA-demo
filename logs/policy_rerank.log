@@ -183,3 +183,13 @@
 {"scores":[{"id":1,"score":0,"reason":"irrelevant content about airspace and structures"},{"id":2,"score":0,"reason":"table of contents, no relevant information"},{"id":3,"score":1,"reason":"tangential mention of altitude but not specific to Part 107 regulations"},{"id":4,"score":2,"reason":"strongly implies relevance to regulations but lacks specific altitude limits"},{"id":5,"score":2,"reason":"implies knowledge areas related to regulations but not specific to altitude limits"},{"id":6,"score":1,"reason":"tangential mention of ceiling but not directly related to operational safety or altitude limits"}]}
 ```
 2026-02-16 12:09:17 INFO altitude_warning.policy.retriever policy_rerank.scores
+2026-02-16 15:09:02 INFO altitude_warning.policy.retriever policy_rerank.start
+2026-02-16 15:09:05 DEBUG altitude_warning.policy.retriever policy_rerank.raw content=```json
+{"scores":[{"id":1,"score":0,"reason":"irrelevant to altitude limits or operational safety"},{"id":2,"score":0,"reason":"irrelevant to altitude limits or operational safety"},{"id":3,"score":1,"reason":"tangential mention of altitude but not specific to Part 107 limits"},{"id":4,"score":1,"reason":"tangential mention of ceiling but not specific to Part 107 limits"},{"id":5,"score":2,"reason":"strongly implies relevance to regulations but lacks specific altitude guidance"},{"id":6,"score":3,"reason":"directly states the need to be familiar with Part 107 regulations, which includes altitude limits"}]}
+```
+2026-02-16 15:09:05 INFO altitude_warning.policy.retriever policy_rerank.scores
+2026-02-16 15:09:14 INFO altitude_warning.policy.retriever policy_rerank.start
+2026-02-16 15:09:17 DEBUG altitude_warning.policy.retriever policy_rerank.raw content=```json
+{"scores":[{"id":1,"score":1,"reason":"tangential mention of altitude limits in specific contexts"},{"id":2,"score":0,"reason":"irrelevant table of contents"},{"id":3,"score":1,"reason":"tangential mention of altitude related to structures, not directly addressing query"},{"id":4,"score":2,"reason":"strongly implies relevant guidance on ceiling and visibility, related to operational safety"},{"id":5,"score":2,"reason":"strongly implies relevance to regulations and operational limits"},{"id":6,"score":3,"reason":"directly states the need to be familiar with 14 CFR part 107, which includes altitude limits"}]}
+```
+2026-02-16 15:09:17 INFO altitude_warning.policy.retriever policy_rerank.scores

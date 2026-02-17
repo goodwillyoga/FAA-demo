@@ -2,10 +2,27 @@
 
 This runbook tracks the end-to-end steps for the FAA altitude early warning demo.
 
-## 📋 For FAA Stakeholders & Demo Attendees
-**Start here:** [FAA_DEMO_GUIDE.md](FAA_DEMO_GUIDE.md) — Complete system overview, tool specifications, test scenarios, and results.
+## Quick Start
+- See CONTRIBUTING.md for environment setup and install steps.
+- Build data: `make build-data`
+- Start the demo UI: `./scripts/run_demo_ui.sh`
+- Run all scenarios: `pytest tests/test_orchestrator_scenario_sweep.py -v`
+
+## Data Artifacts
+- data/raw/telemetry.csv
+- data/raw/weather.csv
+- data/processed/telemetry_processed.csv
+- data/processed/ceiling_risk_features.csv
+
+## System Steps
+1. Build data artifacts
+2. Start Weaviate (if needed)
+3. Run the orchestrator and UI
+4. Review results and traces
 
 ---
+For architecture and demo details, see DEMO_GUIDE.md.
+For developer and design info, see DEVELOPER_GUIDE.md and DESIGN_GUIDE.md.
 
 ## Setup (One-Time)
 

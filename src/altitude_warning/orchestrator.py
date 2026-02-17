@@ -248,6 +248,16 @@ class Orchestrator:
         should_alert = bool(decision.should_alert)
         rationale = decision.rationale.strip() if decision.rationale else "Guardrail: no rationale provided."
 
+        # Guardrail: Validate HIGH risk + no alert inconsistency
+        # Route to HITL for operator review rather than silently fixing
+        if risk_band == "HIGH" and not should_alert:
+            route = "hitl_review"
+            rationale = f"Guardrail: HIGH risk without alert routed to HITL review. {rationale}"
+            self.logger.warning(
+                f"Inconsistent decision detected: HIGH risk_band={risk_band} but should_alert={should_alert}. "
+                f"Routing to HITL. Decision: {decision}"
+            )
+
         if not self._has_citation(rationale):
             rationale = f"Guardrail: missing citation. {rationale}"
 
@@ -419,7 +429,15 @@ class Orchestrator:
         if assessment is None or llm_decision is None:
             raise ValueError("Missing decision state")
 
-        if llm_decision.should_alert:
+        # Construct message based on final route (which may have been corrected by guardrail)
+        if llm_decision.route == "hitl_review":
+            # Routed to HITL - explain why (risk assessment or guardrail correction)
+            message = (
+                f"Risk score {llm_decision.risk_band}: {assessment.risk_score:.2f}. "
+                f"Routed to operator review. Predicted: {assessment.predicted_altitude_ft:.1f}ft vs Ceiling: {assessment.ceiling_ft:.1f}ft."
+            )
+            status = "reviewing"
+        elif llm_decision.should_alert:
             eta_seconds = 8
             message = (
                 f"Likely ceiling breach in {eta_seconds}s: projected {assessment.predicted_altitude_ft:.1f}ft "

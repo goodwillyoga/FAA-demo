@@ -1,6 +1,6 @@
 {
   "scenario_id": "feature1_lowrisk_stable_flight",
-  "description": "LOW RISK: Drone D-0001 horizontal flight well within ceiling, excellent conditions",
+  "description": "LOW RISK: Unmanned aircraft D-0001 horizontal flight well within ceiling, excellent conditions",
   "risk_category": "LOW",
   "faa_guidance": "14 CFR 107.19 (safe altitude, no alert expected)",
   "events": [

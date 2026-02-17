@@ -1,6 +1,6 @@
 {
   "scenario_id": "feature1_highriskceilingbreach_gustywind",
-  "description": "HIGH RISK: Drone D-0001 climbing toward 300ft ceiling with gusty wind conditions",
+  "description": "HIGH RISK: Unmanned aircraft D-0001 climbing toward 300ft ceiling with gusty wind conditions",
   "risk_category": "HIGH",
   "faa_guidance": "14 CFR 107.19 (remote altitude restrictions) + wind safety margin",
   "events": [
