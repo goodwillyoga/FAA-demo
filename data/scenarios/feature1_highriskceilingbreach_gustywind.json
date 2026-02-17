@@ -1,0 +1,36 @@
+{
+  "scenario_id": "feature1_highriskceilingbreach_gustywind",
+  "description": "HIGH RISK: Unmanned aircraft D-0001 climbing toward 300ft ceiling with gusty wind conditions",
+  "risk_category": "HIGH",
+  "faa_guidance": "14 CFR 107.19 (remote altitude restrictions) + wind safety margin",
+  "events": [
+    {
+      "drone_id": "D-0001",
+      "lat": 37.62,
+      "lon": -122.35,
+      "altitude_ft": 280.0,
+      "vertical_speed_fps": 3.5,
+      "ground_speed_fps": 15.0,
+      "heading_deg": 90.0,
+      "wind_mps": 3.58,
+      "gust_mps": 5.36,
+      "wind_direction_deg": 180.0,
+      "visibility_km": 9.95,
+      "timestamp_iso": "2026-02-13T20:00:00Z"
+    },
+    {
+      "drone_id": "D-0001",
+      "lat": 37.62,
+      "lon": -122.35,
+      "altitude_ft": 288.0,
+      "vertical_speed_fps": 3.5,
+      "ground_speed_fps": 15.0,
+      "heading_deg": 90.0,
+      "wind_mps": 3.65,
+      "gust_mps": 5.82,
+      "wind_direction_deg": 185.0,
+      "visibility_km": 9.9,
+      "timestamp_iso": "2026-02-13T20:00:03Z"
+    }
+  ]
+}

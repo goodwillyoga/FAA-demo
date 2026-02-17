@@ -1,0 +1,23 @@
+{
+  "scenario_id": "feature1_altitude_breach",
+  "description": "Unmanned aircraft climbs toward a 300ft ceiling and triggers early warning",
+  "risk_category": "MEDIUM",
+  "events": [
+    {
+      "drone_id": "D-1001",
+      "lat": 37.62,
+      "lon": -122.35,
+      "altitude_ft": 280.0,
+      "vertical_speed_fps": 3.5,
+      "timestamp_iso": "2026-02-13T20:00:00Z"
+    },
+    {
+      "drone_id": "D-1001",
+      "lat": 37.62,
+      "lon": -122.35,
+      "altitude_ft": 288.0,
+      "vertical_speed_fps": 3.0,
+      "timestamp_iso": "2026-02-13T20:00:08Z"
+    }
+  ]
+}

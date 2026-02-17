@@ -1,0 +1,2 @@
+scenario_id,risk_category,drone_id,altitude_ft,ceiling_ft,vertical_speed_fps,wind_mps,gust_mps,visibility_km,route,risk_band,risk_score,confidence,should_alert,policy_chunks_retrieved,latency_ms,rationale
+feature1_highriskceilingbreach_gustywind,HIGH,D-0001,280.0,300.0,3.5,N/A,N/A,N/A,hitl_review,MED,0.700,0.650,False,3,10191,The risk score of 0.7 combined with a confidence level of 0.65 indicates a medium risk situation tha

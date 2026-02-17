@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "faa-altitude_warning-altitude-warning"
+version = "0.1.0"
+description = "Phase A altitude early-warning scaffold for FAA reference"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+api = [
+  "fastapi>=0.111",
+  "uvicorn>=0.30"
+]
+dev = [
+  "pytest>=8.0"
+]
+analysis = [
+  "jupyter>=1.0",
+  "matplotlib>=3.8",
+  "pandas>=2.2"
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+markers = [
+  "integration: runs tests that call external services",
+]

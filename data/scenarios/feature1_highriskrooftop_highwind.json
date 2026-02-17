@@ -1,0 +1,36 @@
+{
+  "scenario_id": "feature1_highriskrooftop_highwind",
+  "description": "HIGH RISK: Unmanned aircraft D-0003 at 290ft very close to 300ft ceiling with extreme high wind (6.7+ m/s gust 8.9+)",
+  "risk_category": "HIGH",
+  "faa_guidance": "14 CFR 107.19 + wind safety margin. At 290ft with 300ft = only 10ft margin + climb + extreme wind = imminent HIGH RISK",
+  "events": [
+    {
+      "drone_id": "D-0003",
+      "lat": 37.70,
+      "lon": -122.45,
+      "altitude_ft": 290.0,
+      "vertical_speed_fps": 2.8,
+      "ground_speed_fps": 18.0,
+      "heading_deg": 180.0,
+      "wind_mps": 6.71,
+      "gust_mps": 8.94,
+      "wind_direction_deg": 270.0,
+      "visibility_km": 8.5,
+      "timestamp_iso": "2026-02-13T20:00:00Z"
+    },
+    {
+      "drone_id": "D-0003",
+      "lat": 37.70,
+      "lon": -122.45,
+      "altitude_ft": 298.0,
+      "vertical_speed_fps": 2.8,
+      "ground_speed_fps": 19.0,
+      "heading_deg": 185.0,
+      "wind_mps": 7.15,
+      "gust_mps": 9.37,
+      "wind_direction_deg": 275.0,
+      "visibility_km": 8.2,
+      "timestamp_iso": "2026-02-13T20:00:03Z"
+    }
+  ]
+}
