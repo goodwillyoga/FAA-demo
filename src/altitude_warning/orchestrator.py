@@ -429,9 +429,16 @@ class Orchestrator:
         if assessment is None or llm_decision is None:
             raise ValueError("Missing decision state")
 
-        # Construct message based on final route (which may have been corrected by guardrail)
-        if llm_decision.route == "hitl_review":
-            # Routed to HITL - explain why (risk assessment or guardrail correction)
+
+        # If HITL approval was completed, mark as complete (simulate HITL queue completion)
+        hitl_approval_needed = state.get("hitl_approval_needed", True)
+        if llm_decision.route == "hitl_review" and not hitl_approval_needed:
+            message = (
+                f"HITL approval complete. Risk score {llm_decision.risk_band}: {assessment.risk_score:.2f}. "
+                f"Operator approved. Predicted: {assessment.predicted_altitude_ft:.1f}ft vs Ceiling: {assessment.ceiling_ft:.1f}ft."
+            )
+            status = "approved"
+        elif llm_decision.route == "hitl_review":
             message = (
                 f"Risk score {llm_decision.risk_band}: {assessment.risk_score:.2f}. "
                 f"Routed to operator review. Predicted: {assessment.predicted_altitude_ft:.1f}ft vs Ceiling: {assessment.ceiling_ft:.1f}ft."

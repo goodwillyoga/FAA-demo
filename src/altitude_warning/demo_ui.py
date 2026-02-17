@@ -23,6 +23,12 @@ from typing import Any, Optional
 import streamlit as st
 import plotly.graph_objects as go
 
+import warnings
+warnings.filterwarnings(
+    "ignore",
+    message="Pydantic serializer warnings"
+)
+
 # ----------------------------
 # CSS loader (simple)
 # ----------------------------
@@ -113,20 +119,71 @@ def process_scenario(
     orchestrator = Orchestrator(trace_enabled=True, enable_policy_retrieval=enable_retrieval)
     events = load_scenario_events(scenario_path)
 
-    results: list[dict[str, Any]] = []
-    for idx, event in enumerate(events, start=1):
-        if progress_callback:
-            progress_callback(idx, len(events), f"Processing Event {idx}/{len(events)}: {event.drone_id}")
+    import csv
+    from datetime import datetime, timezone
+    from pathlib import Path
 
-        decision, assessment, _policy_context, latency_ms = orchestrator.process_event(event)
-        results.append(
-            {
-                "event": event,
-                "decision": decision,
-                "assessment": assessment,
-                "latency_ms": latency_ms,
-            }
-        )
+    results: list[dict[str, Any]] = []
+    # Prepare CSV output
+    output_dir = Path("outputs")
+    output_dir.mkdir(parents=True, exist_ok=True)
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    csv_path = output_dir / f"scenario_sweep_baseline_{stamp}.csv"
+    fieldnames = [
+        "scenario_id",
+        "risk_category",
+        "drone_id",
+        "altitude_ft",
+        "ceiling_ft",
+        "vertical_speed_fps",
+        "wind_mps",
+        "gust_mps",
+        "visibility_km",
+        "route",
+        "risk_band",
+        "risk_score",
+        "confidence",
+        "should_alert",
+        "policy_chunks_retrieved",
+        "latency_ms",
+        "rationale",
+    ]
+    with csv_path.open("w", newline="", encoding="utf-8") as fh:
+        writer = csv.DictWriter(fh, fieldnames=fieldnames)
+        writer.writeheader()
+        for idx, event in enumerate(events, start=1):
+            if progress_callback:
+                progress_callback(idx, len(events), f"Processing Event {idx}/{len(events)}: {event.drone_id}")
+
+            decision, assessment, policy_context, latency_ms = orchestrator.process_event(event)
+            results.append(
+                {
+                    "event": event,
+                    "decision": decision,
+                    "assessment": assessment,
+                    "latency_ms": latency_ms,
+                }
+            )
+            # Write row to CSV
+            writer.writerow({
+                "scenario_id": getattr(event, "scenario_id", "demo"),
+                "risk_category": getattr(event, "risk_category", "UNKNOWN"),
+                "drone_id": getattr(event, "drone_id", ""),
+                "altitude_ft": getattr(event, "altitude_ft", ""),
+                "ceiling_ft": getattr(assessment, "ceiling_ft", ""),
+                "vertical_speed_fps": getattr(event, "vertical_speed_fps", ""),
+                "wind_mps": getattr(event, "wind_mps", "N/A"),
+                "gust_mps": getattr(event, "gust_mps", "N/A"),
+                "visibility_km": getattr(event, "visibility_km", "N/A"),
+                "route": getattr(decision, "route", ""),
+                "risk_band": getattr(decision, "risk_band", ""),
+                "risk_score": f"{getattr(assessment, 'risk_score', 0.0):.3f}",
+                "confidence": f"{getattr(assessment, 'confidence', 0.0):.3f}",
+                "should_alert": getattr(decision, "should_alert", ""),
+                "policy_chunks_retrieved": len(policy_context) if policy_context else 0,
+                "latency_ms": f"{latency_ms:.0f}",
+                "rationale": (getattr(decision, "rationale", "")[:100] if getattr(decision, "rationale", None) else ""),
+            })
     return results
 
 def is_langsmith_enabled() -> bool:
@@ -342,8 +399,41 @@ def render_trace_analysis_tab(results: list[dict[str, Any]], show_langsmith: boo
         avg = stats["total_latency_ms"] / max(1, stats["total_events"])
         st.metric("Avg/Event", f"{avg:.2f} ms")
 
+
     if show_langsmith and is_langsmith_enabled():
-        st.info("LangSmith is enabled; runs will appear in your LangSmith project.")
+        langsmith_project = os.getenv("LANGCHAIN_PROJECT", "")
+        langsmith_url = f"https://smith.langchain.com/o/projects?projectName={langsmith_project}" if langsmith_project else "https://smith.langchain.com/"
+        st.markdown(f"<span style='color: #228B22; font-weight: bold;'>LangSmith is enabled; runs will appear in your LangSmith project: <a href='{langsmith_url}' target='_blank'>Open LangSmith Project</a></span>", unsafe_allow_html=True)
+
+    st.markdown("---")
+    st.markdown("### State Transitions (per event)")
+    for idx, result in enumerate(results, start=1):
+        decision = result.get("decision", {})
+        trace = getattr(decision, "trace", None) or decision.get("trace", [])
+        event = result.get("event", {})
+        with st.expander(f"Event {idx}: {getattr(event, 'drone_id', '')} @ {getattr(event, 'timestamp_iso', '')}", expanded=(idx == 1)):
+            if not trace:
+                st.info("No trace available for this event.")
+                continue
+            for step_num, step in enumerate(trace, start=1):
+                step_name = step.get("name", "unknown")
+                duration = step.get("duration_ms", 0)
+                inputs = step.get("inputs", {})
+                outputs = step.get("outputs", {})
+                st.markdown(f"**Step {step_num}: {step_name}**  ")
+                st.markdown(f"- Duration: `{duration:.2f} ms`")
+                if inputs:
+                    st.markdown("  - Inputs:")
+                    for k, v in inputs.items():
+                        st.markdown(f"    - `{k}`: `{v}`")
+                if outputs:
+                    st.markdown("  - Outputs:")
+                    for k, v in outputs.items():
+                        if k == "rationale":
+                            st.markdown(f"    - <span style='color: #228B22; font-weight: bold;'>`{k}`: `{v}`</span>", unsafe_allow_html=True)
+                        else:
+                            st.markdown(f"    - `{k}`: `{v}`")
+                st.markdown("---")
 
 def render_decision_card(result: dict[str, Any], event_num: int) -> None:
     decision = result["decision"]
@@ -380,7 +470,7 @@ def render_decision_card(result: dict[str, Any], event_num: int) -> None:
 # ----------------------------
 
 def main() -> None:
-    st.set_page_config(page_title="🚁 Real-Time sUAS Telemetry to Risk Decision Workflow", page_icon="🚁", layout="wide")
+    st.set_page_config(page_title="sUAS Telemetry to Risk Decision Workflow", page_icon="🚁", layout="wide")
     _load_css("demo_ui.css")
 
     st.title("🚁 sUAS Telemetry to Risk Decision Workflow")
@@ -416,52 +506,53 @@ def main() -> None:
     ceiling_ft = float(metadata["ceiling_ft"] or 300.0)
     # Telemetry plot (no orchestrator needed)
     st.divider()
-    st.subheader("Telemetry & linear projection")
+    with st.expander("Telemetry & linear projection", expanded=True):
+        events = load_scenario_events(selected_path)
+        if not events:
+            st.info("Scenario has no telemetry events.")
+            return
 
-    events = load_scenario_events(selected_path)
-    if not events:
-        st.info("Scenario has no telemetry events.")
-        return
+        # Event dropdown (instead of slider)
+        labels = [_event_label(i, e) for i, e in enumerate(events)]
+        label_to_idx = {labels[i]: i for i in range(len(labels))}
+        selected_label = st.selectbox("Select event", options=labels, index=0)
+        selected_event_idx = label_to_idx[selected_label]
 
-    # Event dropdown (instead of slider)
-    labels = [_event_label(i, e) for i, e in enumerate(events)]
-    label_to_idx = {labels[i]: i for i in range(len(labels))}
-    selected_label = st.selectbox("Select event", options=labels, index=0)
-    selected_event_idx = label_to_idx[selected_label]
+        # Playback controls (just for telemetry section)
+        if "telemetry_play_dt" not in st.session_state:
+            st.session_state["telemetry_play_dt"] = None
 
-    # Playback controls (just for telemetry section)
-    if "telemetry_play_dt" not in st.session_state:
-        st.session_state["telemetry_play_dt"] = None
+        colA, colB, colC = st.columns([1, 1, 3])
+        with colC:
+            st.caption("Hover points for details. The dashed line is the linear projection; the red dashed line is the ceiling.")
+        with colA:
+            play = st.button("▶ Play (up to 8 seconds)", use_container_width=True)
+        with colB:
+            reset = st.button("⟲ Reset", use_container_width=True)
 
-    colA, colB, colC = st.columns([1, 1, 3])
-    with colA:
-        play = st.button("▶ Play (up to 8 seconds)", use_container_width=True)
-    with colB:
-        reset = st.button("⟲ Reset", use_container_width=True)
+        if reset:
+            st.session_state["telemetry_play_dt"] = None
 
-    if reset:
-        st.session_state["telemetry_play_dt"] = None
+        chart_ph = st.empty()
 
-    chart_ph = st.empty()
+        if play:
+            # Frame-by-frame update (9 frames). This blocks briefly but is reliable for a demo.
+            import time
+            for dt in range(0, 9):
+                fig = render_telemetry_plot(events, selected_event_idx, ceiling_ft=ceiling_ft, highlight_dt=dt)
+                chart_ph.plotly_chart(fig, use_container_width=True, config={"displayModeBar": True})
+                time.sleep(0.18)
+            st.session_state["telemetry_play_dt"] = 8
 
-    if play:
-        # Frame-by-frame update (9 frames). This blocks briefly but is reliable for a demo.
-        import time
-        for dt in range(0, 9):
-            fig = render_telemetry_plot(events, selected_event_idx, ceiling_ft=ceiling_ft, highlight_dt=dt)
+        # If not playing, render static chart (or the last frame after play)
+        if not play:
+            fig = render_telemetry_plot(
+                events,
+                selected_event_idx,
+                ceiling_ft=ceiling_ft,
+                highlight_dt=st.session_state.get("telemetry_play_dt", None),
+            )
             chart_ph.plotly_chart(fig, use_container_width=True, config={"displayModeBar": True})
-            time.sleep(0.18)
-        st.session_state["telemetry_play_dt"] = 8
-
-    # If not playing, render static chart (or the last frame after play)
-    if not play:
-        fig = render_telemetry_plot(
-            events,
-            selected_event_idx,
-            ceiling_ft=ceiling_ft,
-            highlight_dt=st.session_state.get("telemetry_play_dt", None),
-        )
-        chart_ph.plotly_chart(fig, use_container_width=True, config={"displayModeBar": True})
 
     # Orchestrator section
     st.divider()
