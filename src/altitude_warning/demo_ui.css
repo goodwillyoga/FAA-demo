@@ -1,0 +1,113 @@
+
+/* demo_ui_demo.css
+Compact, professional spacing for the Streamlit demo UI.
+Focus: reduce wasted vertical space + align metric cards.
+*/
+
+.block-container {
+  padding: 0.75rem 1.0rem !important;
+  max-width: 1500px !important;
+}
+
+section.main > div {
+  padding-top: 0.5rem !important;
+}
+
+/* Headings */
+h1 {
+  font-size: 2.0rem !important;
+  line-height: 1.10 !important;
+  margin: 0.75rem 0 0.35rem 0 !important;
+}
+h2 {
+  font-size: 1.45rem !important;
+  line-height: 1.12 !important;
+  margin: 0.75rem 0 0.35rem 0 !important;
+}
+h3 {
+  font-size: 1.15rem !important;
+  line-height: 1.15 !important;
+  margin: 0.65rem 0 0.30rem 0 !important;
+}
+
+/* Caption + markdown rhythm */
+[data-testid="stCaption"] {
+  margin: 0.20rem 0 !important;
+  line-height: 1.25 !important;
+}
+[data-testid="stMarkdown"] {
+  margin: 0.20rem 0 !important;
+  padding: 0 !important;
+}
+[data-testid="stMarkdown"] p {
+  margin: 0.20rem 0 !important;
+}
+
+/* Dividers */
+hr, [data-testid="stDivider"] {
+  margin: 0.65rem 0 !important;
+  padding: 0 !important;
+}
+
+/* Columns / spacing */
+[data-testid="stHorizontalBlock"] { gap: 0.65rem !important; }
+[data-testid="stColumn"] { padding: 0 0.20rem !important; }
+
+/* Metric cards: unified height */
+[data-testid="stMetric"] {
+  margin: 0.40rem 0 !important;
+  padding: 0.65rem !important;
+  min-height: 78px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+[data-testid="stMetricValue"] {
+  font-size: 1.55rem !important;
+  line-height: 1.05 !important;
+}
+
+/* Inputs */
+[data-testid="stSelectbox"],
+[data-testid="stCheckbox"],
+[data-testid="stToggle"],
+button {
+  margin: 0.40rem 0 !important;
+}
+
+/* Expanders */
+[data-testid="stExpander"] { margin: 0.40rem 0 !important; }
+[data-testid="stExpanderDetails"] { padding: 0.90rem !important; }
+
+/* Alerts */
+[data-testid="stAlert"] {
+  margin: 0.40rem 0 !important;
+  padding: 0.65rem !important;
+}
+/* Global block spacing (tight) */
+[data-testid="stVerticalBlock"] { gap: 0.35rem !important; }
+[data-testid="stElementContainer"] { margin: 0.20rem 0 !important; }
+div[data-testid="stText"] { margin: 0.10rem 0 !important; }
+
+/* Reduce space above first element */
+.main .block-container { padding-top: 0.6rem !important; }
+
+/* Tabs tighter */
+[data-testid="stTabs"] { margin-top: 0.25rem !important; }
+[data-testid="stTabContent"] { padding-top: 0.25rem !important; }
+
+/* Plotly chart container */
+[data-testid="stPlotlyChart"] { margin: 0.25rem 0 !important; }
+
+/* Buttons tighter */
+div.stButton > button { padding: 0.35rem 0.6rem !important; }
+
+/* Expander header + body tighter */
+[data-testid="stExpander"] summary { padding: 0.30rem 0.35rem !important; }
+[data-testid="stExpanderDetails"] { padding: 0.55rem 0.65rem !important; }
+
+/* Metrics: reduce internal padding slightly */
+[data-testid="stMetric"] { padding: 0.55rem !important; min-height: 72px !important; }
+
+/* Selectbox/input containers tighter */
+[data-testid="stSelectbox"] > div { padding-top: 0 !important; }
