@@ -12,3 +12,4 @@ python-dotenv>=1.0
 weaviate-client>=4.9
 pypdf>=4.2
 streamlit>=1.30
+plotly==5.22.0

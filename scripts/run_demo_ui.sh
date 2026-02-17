@@ -19,5 +19,5 @@ if ! python -c "import streamlit" 2>/dev/null; then
 fi
 
 # Run the demo
-export PYTHONPATH="$PROJECT_ROOT/src:$PYTHONPATH"
+export PYTHONPATH="$PROJECT_ROOT/src${PYTHONPATH:+:$PYTHONPATH}"
 streamlit run src/altitude_warning/demo_ui.py --server.port 8501 --server.headless false
