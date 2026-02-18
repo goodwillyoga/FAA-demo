@@ -182,6 +182,11 @@ class Orchestrator:
         start = perf_counter()
 
         if assessment is None or not self.enable_policy_retrieval:
+            self.logger.info(
+                "Policy retrieval skipped: enabled=%s assessment_present=%s",
+                self.enable_policy_retrieval,
+                assessment is not None,
+            )
             trace = self._append_trace(
                 state["trace"],
                 "retrieve_policy",
@@ -208,6 +213,16 @@ class Orchestrator:
                 policy_context.append(
                     f"[S{idx}] [{snippet.source} p.{snippet.page}] {text}"
                 )
+            if policy_context:
+                self.logger.info(
+                    "Policy retrieval success: chunks=%d query=%s",
+                    len(policy_context),
+                    query,
+                )
+                for chunk in policy_context:
+                    self.logger.info("Policy chunk: %s", chunk)
+            else:
+                self.logger.info("Policy retrieval returned 0 chunks for query=%s", query)
         except Exception as exc:
             error = f"Policy retrieval failed: {type(exc).__name__}: {str(exc)}"
             self.logger.warning(error)

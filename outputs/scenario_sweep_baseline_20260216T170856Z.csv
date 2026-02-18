@@ -1,2 +1,0 @@
-scenario_id,risk_category,drone_id,altitude_ft,ceiling_ft,vertical_speed_fps,wind_mps,gust_mps,visibility_km,route,risk_band,risk_score,confidence,should_alert,policy_chunks_retrieved,latency_ms,rationale
-feature1_highriskrooftop_highwind,HIGH,D-0003,290.0,300.0,2.8,N/A,N/A,N/A,hitl_review,HIGH,0.917,0.570,True,3,13682,"The risk score of 0.917 indicates a high risk situation, and the confidence level of 0.57 is below t"

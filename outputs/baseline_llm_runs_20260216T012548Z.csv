@@ -1,2 +1,0 @@
-altitude_ft,vertical_speed_fps,lat,lon,route,risk_band,risk_score,confidence,rationale,predicted_altitude_ft,ceiling_ft
-280.0,3.5,37.62,-122.35,hitl_review,HIGH,1.0,0.85,"The predicted altitude exceeds the ceiling limit, indicating a potential violation of FAA Part 107 regulations, necessitating a human-in-the-loop review.",308.0,300.0

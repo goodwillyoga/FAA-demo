@@ -1,2 +1,0 @@
-scenario_id,risk_category,drone_id,altitude_ft,ceiling_ft,vertical_speed_fps,wind_mps,gust_mps,visibility_km,route,risk_band,risk_score,confidence,should_alert,policy_chunks_retrieved,latency_ms,rationale
-feature1_highriskrooftop_highwind,HIGH,D-0003,290.0,300.0,2.8,N/A,N/A,N/A,hitl_review,MED,0.700,0.650,False,3,9392,The risk score of 0.7 combined with a confidence level of 0.65 indicates a potential violation of FA
