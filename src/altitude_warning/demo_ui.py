@@ -401,9 +401,8 @@ def render_trace_analysis_tab(results: list[dict[str, Any]], show_langsmith: boo
 
 
     if show_langsmith and is_langsmith_enabled():
-        langsmith_project = os.getenv("LANGCHAIN_PROJECT", "")
-        langsmith_url = f"https://smith.langchain.com/o/projects?projectName={langsmith_project}" if langsmith_project else "https://smith.langchain.com/"
-        st.markdown(f"<span style='color: #228B22; font-weight: bold;'>LangSmith is enabled; runs will appear in your LangSmith project: <a href='{langsmith_url}' target='_blank'>Open LangSmith Project</a></span>", unsafe_allow_html=True)
+        langsmith_url = "https://smith.langchain.com"
+        st.markdown(f"<span style='color: #228B22; font-weight: bold;'>LangSmith is enabled; runs will appear in your LangSmith project: <a href='{langsmith_url}' target='_blank'>Open LangSmith</a></span>", unsafe_allow_html=True)
 
     st.markdown("---")
     st.markdown("### State Transitions (per event)")
