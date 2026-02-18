@@ -1,8 +1,5 @@
 # Altitude Early Warning
 
-[![CI](https://github.com/goodwillyoga/FAA-demo/actions/workflows/ci.yml/badge.svg)](https://github.com/goodwillyoga/FAA-demo/actions/workflows/ci.yml)
-![Python](https://img.shields.io/badge/python-3.11%2B-blue)
-
 Low-altitude risk awareness for UAS operations, focused on early warning and human-governed, policy-constrained response.
 
 ## Why This Project
