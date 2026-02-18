@@ -3,17 +3,17 @@
 [![CI](https://github.com/goodwillyoga/FAA-demo/actions/workflows/ci.yml/badge.svg)](https://github.com/goodwillyoga/FAA-demo/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
 
-Autonomous low-altitude risk awareness for UAS operations, focused on early warning and human-governed response.
+Low-altitude risk awareness for UAS operations, focused on early warning and human-governed, policy-constrained response.
 
 ## Why This Project
 Low-altitude airspace is becoming denser, and safety teams need earlier warning signals than manual monitoring can provide.
-This project shows how an agentic orchestration layer can sit on top of existing data and model pipelines to produce actionable risk alerts with clear audit trails.
+This project demonstrates how an agentic orchestration layer can sit on top of existing data, models, and enterprise systems to rapidly fuse unstructured data into context and produce actionable risk alerts with clear audit trails in near real time.
 
 ## What It Delivers
 - Early warning of likely altitude-ceiling crossing before violation occurs.
 - Stateful orchestration across risk tools and policy routing.
 - Human-in-the-loop escalation path for high-risk or low-confidence decisions.
-- Technical traceability for review, replay, and governance.
+- Technical traceability and governance.
 
 ## 🚀 FAA Demo: Start Here
 **For a complete walkthrough of the system, 5 test scenarios, tool specifications, and routing rules, see:**

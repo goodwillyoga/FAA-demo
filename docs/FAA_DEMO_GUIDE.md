@@ -2,9 +2,9 @@
 
 ## Executive Summary
 
-This document outlines the **Altitude Early Warning System** — a LangGraph-based autonomous agent that detects potential ceiling breaches in real-time and routes decisions to human operators (HITL) when confidence is insufficient.
+This document outlines the **Altitude Early Warning System** — a LangGraph-based autonomous agent that detects potential ceiling breaches in near real-time and routes decisions to human operators (HITL) when confidence is insufficient.
 
-**Key Differentiator:** Safety-critical computations (risk assessment, visibility impact) are executed via **deterministic tools**, not LLM reasoning, ensuring FAA auditability.
+**Key Differentiator:** Safety-critical computations (risk assessment, visibility impact) are executed via **deterministic tools**, and LLM reasoning with FAA policy guides, for increased compliance.
 
 ---
 
@@ -41,7 +41,7 @@ Policy Context [S1], [S2], [S3] citations
 
 ---
 
-## 2. Tool Suite (Deterministic, FAA-Auditable)
+## 2. Tool Suite (Deterministic, Auditable)
 
 ### Tool 1: `ceiling_tool(lat, lon) → float`
 **Purpose:** Retrieve ceiling altitude for the drone's current location.
@@ -50,7 +50,7 @@ Policy Context [S1], [S2], [S3] citations
 - San Francisco Bay Area (lat > 37.6, lon < -122.2): **300ft** (restricted airspace)
 - Default: **400ft** (standard Part 107 limit)
 
-**FAA Value:** No API calls, no external dependencies, deterministic and repeatable.
+**Business Value:** No API calls, no external dependencies, deterministic and repeatable.
 
 ---
 
@@ -63,7 +63,7 @@ Policy Context [S1], [S2], [S3] citations
 - Current: 280ft, Climb rate: 3.5 ft/s, Horizon: 8s
 - Projected: 280 + (3.5 × 8) = **308ft**
 
-**FAA Value:** Physics-based, no black boxes, deterministic projection.
+**Business Value:** Deterministic projection.
 
 ---
 
@@ -90,7 +90,7 @@ confidence = 0.6 + 0.25×climb_factor  (higher climb = higher confidence in asse
 - risk_score = 0.82 + 0.027 + (0.05 × 0.35) = **0.85** (HIGH)
 - confidence = 0.6 + (0.25 × 0.35) = **0.69**
 
-**FAA Value:** Explicit formula, auditable coefficients, no LLM guessing.
+**Business Value:** Computed formula, auditable coefficients.
 
 ---
 
@@ -111,7 +111,7 @@ confidence = 0.6 + 0.25×climb_factor  (higher climb = higher confidence in asse
 - Adjusted confidence: 0.70 - (0.70 × 0.20) = **0.56** (below auto_notify threshold)
 - **Result:** Routes to hitl_review instead of auto_notify
 
-**FAA Value:** Environmental factors explicitly penalize confidence, forcing human review in marginal conditions.
+**Value:** Environmental factors explicitly penalize confidence, forcing human review in marginal conditions.
 
 ---
 
@@ -156,7 +156,7 @@ Escalating to human review per operational safety protocols [S2]."
 
 ---
 
-## 5. Test Scenarios (5 FAA-Guided Cases)
+## 5. Test Scenarios (5 Scenario-Guided Cases)
 
 All scenarios use **gpt-4o-mini** with live LLM calls. Test data embedded in scenario JSON files under `data/scenarios/`.
 
@@ -350,7 +350,7 @@ pytest tests/test_orchestrator_scenario_sweep.py::test_scenario_sweep_with_live_
 
 ## 9. Key Design Decisions
 
-| Decision | Rationale | FAA Value |
+| Decision | Rationale | Business Value |
 |----------|-----------|-----------|
 | **Tools over LLM reasoning** | Deterministic safety calculations | Auditable, repeatable, no black boxes |
 | **Weaviate RAG for policy** | Cited guidance in rationale | Traceability to 14 CFR Part 107 |
