@@ -1,0 +1,2 @@
+scenario_id,risk_category,drone_id,altitude_ft,ceiling_ft,vertical_speed_fps,wind_mps,gust_mps,visibility_km,route,risk_band,risk_score,confidence,should_alert,policy_chunks_retrieved,latency_ms,rationale
+feature1_highrisklow_ceiling_poorvisibility,HIGH,D-0002,280.0,300.0,3.2,N/A,N/A,N/A,hitl_review,HIGH,0.873,0.680,True,3,16639,"The risk score of 0.873 indicates a high risk situation, and the confidence level of 0.68 is below t"

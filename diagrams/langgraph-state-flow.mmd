@@ -1,0 +1,26 @@
+flowchart LR
+    start([START]) --> assess["assess_risk<br/>📝 ASSESS_SYSTEM_PROMPT"]
+    assess --> retrieve["retrieve_policy<br/>🔍 Weaviate RAG"]
+    retrieve --> decide["decide_route<br/>📝 DECIDE_SYSTEM<br/>+ CONTEXT_PROMPT"]
+    decide -->|hitl_review or<br/>high risk + low conf| hitl["hitl_approval<br/>👤 Operator Review"]
+    decide -->|auto_notify| emit["emit_decision<br/>✓ Structured Output"]
+    decide -->|error| error["handle_error<br/>⚠️ Fallback Decision"]
+    hitl --> emit
+    emit --> finish([END])
+    error --> finish
+
+    start_state["State at START\n- event\n- trace_id\n- trace: []\n- error: None\n- hitl_approval_needed: False"]
+    assess_state["State after assess_risk\n- assessment: predicted_altitude_ft, ceiling_ft, risk_score, confidence (LLM-derived)\n- trace += assess_risk\n- OR error if assessment fails"]
+    retrieve_state["State after retrieve_policy\n- policy_context: [policy snippets with citations]\n- trace += retrieve_policy\n- Gracefully degrades if retrieval fails"]
+    decide_state["State after decide_route\n- llm_decision: route, should_alert, rationale\n- assessment.route, assessment.should_alert\n- trace += decide_route\n- OR error if decision fails"]
+    hitl_state["State after hitl_approval\n- hitl_approval_needed: False\n- trace += hitl_approval\n- Simulates operator review"]
+    emit_state["State after emit_decision\n- decision: status, message, route, risk_score, confidence\n- trace += emit_decision"]
+    error_state["State after handle_error\n- decision: error status with fallback\n- Logs error to file"]
+
+    start -.-> start_state
+    assess -.-> assess_state
+    retrieve -.-> retrieve_state
+    decide -.-> decide_state
+    hitl -.-> hitl_state
+    emit -.-> emit_state
+    error -.-> error_state

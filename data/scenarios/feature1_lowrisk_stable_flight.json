@@ -1,0 +1,36 @@
+{
+  "scenario_id": "feature1_lowrisk_stable_flight",
+  "description": "LOW RISK: Unmanned aircraft D-0001 horizontal flight well within ceiling, excellent conditions",
+  "risk_category": "LOW",
+  "faa_guidance": "14 CFR 107.19 (safe altitude, no alert expected)",
+  "events": [
+    {
+      "drone_id": "D-0001",
+      "lat": 37.62,
+      "lon": -122.35,
+      "altitude_ft": 150.0,
+      "vertical_speed_fps": 0.0,
+      "ground_speed_fps": 12.0,
+      "heading_deg": 90.0,
+      "wind_mps": 0.45,
+      "gust_mps": 0.89,
+      "wind_direction_deg": 180.0,
+      "visibility_km": 15.0,
+      "timestamp_iso": "2026-02-13T20:00:00Z"
+    },
+    {
+      "drone_id": "D-0001",
+      "lat": 37.62,
+      "lon": -122.35,
+      "altitude_ft": 148.0,
+      "vertical_speed_fps": 0.0,
+      "ground_speed_fps": 12.0,
+      "heading_deg": 90.0,
+      "wind_mps": 0.50,
+      "gust_mps": 0.95,
+      "wind_direction_deg": 185.0,
+      "visibility_km": 15.0,
+      "timestamp_iso": "2026-02-13T20:00:05Z"
+    }
+  ]
+}

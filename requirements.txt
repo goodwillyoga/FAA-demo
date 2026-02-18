@@ -1,0 +1,15 @@
+fastapi>=0.111
+uvicorn>=0.30
+pytest>=8.0
+jupyter>=1.0
+matplotlib>=3.8
+pandas>=2.2
+langchain>=0.3
+langchain-openai>=0.2.0
+langgraph>=0.3.0
+langsmith>=0.2.0
+python-dotenv>=1.0
+weaviate-client>=4.9
+pypdf>=4.2
+streamlit>=1.30
+plotly==5.22.0

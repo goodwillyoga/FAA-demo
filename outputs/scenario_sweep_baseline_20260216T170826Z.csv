@@ -1,0 +1,2 @@
+scenario_id,risk_category,drone_id,altitude_ft,ceiling_ft,vertical_speed_fps,wind_mps,gust_mps,visibility_km,route,risk_band,risk_score,confidence,should_alert,policy_chunks_retrieved,latency_ms,rationale
+feature1_highriskceilingbreach_gustywind,HIGH,D-0001,280.0,300.0,3.5,N/A,N/A,N/A,hitl_review,HIGH,0.891,0.619,True,3,14336,"The risk score of 0.891 indicates a high risk situation, and the confidence level of 0.619 is below "
